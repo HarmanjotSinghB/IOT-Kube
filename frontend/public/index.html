@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Data from Redis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Real-time Data from Redis</h1>
+    <canvas id="myChart" width="400" height="200"></canvas>
+
+    <!-- <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        // Initialize the chart
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Temperature (°C)',
+                        data: [],
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Humidity (%)',
+                        data: [],
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/data');
+                const newData = await response.json();
+
+                // Clear previous data
+                myChart.data.labels = [];
+                myChart.data.datasets[0].data = [];
+                myChart.data.datasets[1].data = [];
+
+                newData.forEach(item => {
+                    const timestamp = new Date(item.timestamp).toLocaleTimeString();
+                    myChart.data.labels.push(timestamp);
+                    myChart.data.datasets[0].data.push(item.data.temperature);
+                    myChart.data.datasets[1].data.push(item.data.humidity);
+                });
+
+                // Limit the number of data points shown on the chart
+                if (myChart.data.labels.length > 20) {
+                    myChart.data.labels = myChart.data.labels.slice(-20);
+                    myChart.data.datasets[0].data = myChart.data.datasets[0].data.slice(-20);
+                    myChart.data.datasets[1].data = myChart.data.datasets[1].data.slice(-20);
+                }
+
+                myChart.update();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        // Fetch data every 2 seconds
+        setInterval(fetchData, 2000);
+    </script> -->
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+    
+        // Initialize the chart
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Temperature (°C)',
+                        data: [],
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Humidity (%)',
+                        data: [],
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/data');
+                const newData = await response.json();
+    
+                // Clear previous data
+                myChart.data.labels = [];
+                myChart.data.datasets[0].data = [];
+                myChart.data.datasets[1].data = [];
+    
+                newData.forEach(item => {
+                    const timestamp = new Date(item.timestamp).toLocaleTimeString();
+                    myChart.data.labels.push(timestamp);
+                    myChart.data.datasets[0].data.push(item.data.temperature);
+                    myChart.data.datasets[1].data.push(item.data.humidity);
+                });
+    
+                // Limit the number of data points shown on the chart
+                // if (myChart.data.labels.length > 20) {
+                //     myChart.data.labels = myChart.data.labels.slice(-20);
+                //     myChart.data.datasets[0].data = myChart.data.datasets[0].data.slice(-20);
+                //     myChart.data.datasets[1].data = myChart.data.datasets[1].data.slice(-20);
+                // }
+    
+                myChart.update();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+    
+        // Fetch data every 2 seconds
+        setInterval(fetchData, 2000);
+    </script>
+    
+</body>
+</html>

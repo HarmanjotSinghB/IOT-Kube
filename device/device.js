@@ -5,12 +5,15 @@ function sendData() {
         humidity: Math.random() * 100
     };
 
+    // Calculate the timestamp for 4 hours ago
+    const timestamp = Date.now() - (4 * 60 * 60 * 1000); // 4 hours in milliseconds
+
     fetch('http://localhost:3000/data', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({ ...data, timestamp }) // Include the timestamp in the body
     })
     .then(res => console.log('Data sent:', res))
     .catch(err => console.error('Error sending data:', err));

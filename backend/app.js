@@ -1,8 +1,11 @@
 const express = require('express');
 const { createClient } = require('@redis/client');
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
+
+app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -21,13 +24,12 @@ client.connect()
     .then(() => {
         console.log('Connected to Redis');
 
-        // Define the /data POST route
+        // POST endpoint to store data
         app.post('/data', async (req, res) => {
             const data = req.body;
-            const timestamp = Date.now(); // Get current timestamp
+            const timestamp = Date.now();
 
             try {
-                // Store data in Redis (key: timestamp, value: data)
                 await client.set(timestamp.toString(), JSON.stringify(data));
                 console.log('Data stored successfully:', timestamp, data);
                 res.status(200).send('Data stored successfully');
@@ -36,6 +38,52 @@ client.connect()
                 res.status(500).send('Error storing data');
             }
         });
+
+        // GET endpoint to fetch data
+        // GET endpoint to fetch data for the last 12 hours
+app.get('/data', async (req, res) => {
+    try {
+        const currentTime = Date.now();
+        const twelveHoursAgo = currentTime - (12 * 60 * 60 * 1000); // 12 hours in milliseconds
+        
+        const keys = await client.keys('*');
+        const dataPromises = keys.map(async (key) => {
+            const value = await client.get(key);
+            const timestamp = parseInt(key);
+            if (timestamp >= twelveHoursAgo) {
+                return {
+                    timestamp: timestamp,
+                    data: JSON.parse(value)
+                };
+            }
+        });
+
+        const processedData = (await Promise.all(dataPromises)).filter(Boolean); // Filter out undefined values
+        res.json(processedData);
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        res.status(500).send('Error fetching data');
+    }
+});
+
+        // app.get('/data', async (req, res) => {
+        //     try {
+        //         const keys = await client.keys('*');
+        //         const dataPromises = keys.map(async (key) => {
+        //             const value = await client.get(key);
+        //             return {
+        //                 timestamp: parseInt(key),
+        //                 data: JSON.parse(value)
+        //             };
+        //         });
+
+        //         const processedData = await Promise.all(dataPromises);
+        //         res.json(processedData);
+        //     } catch (err) {
+        //         console.error('Error fetching data:', err);
+        //         res.status(500).send('Error fetching data');
+        //     }
+        // });
 
         // Start the server
         app.listen(port, () => {
